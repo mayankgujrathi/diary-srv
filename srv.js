@@ -35,12 +35,12 @@ app.use("/auth", require("./routes/auth").router)
 const { loginRequired } = require("./routes/auth")
 
 app.get("/", loginRequired, function (req, res) {
-  res.render("index.html", { user: req.user })
-})
-
-app.get("/cal", loginRequired, function (req, res) {
   res.render("cal.html", { user: req.user })
 })
+
+// app.get("/cal", loginRequired, function (req, res) {
+//   res.render("cal.html", { user: req.user })
+// })
 
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`)

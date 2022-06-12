@@ -26,9 +26,10 @@
   <body>
     <main user-email="<%= user.email %>">
       <section class="side-panel">
+        <p style="color: #aaa; font-size: larger; padding-left: .3rem">Hey, <%= user.email.split("@")[0] %></p>
         <div class="title">
           <p>Events on</p>
-          <span class="date"></span>
+          <span class="date"><%= new Date().toDateString() %></span>
         </div>
         <div class="sec remainders">
           <div class="title">
@@ -72,8 +73,7 @@
             <span class="icon"><i class="fa-solid fa-pen"></i></span>
           </div>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam saepe
-            libero magni consequuntur delectus repellendus!
+            to add new journal, click on pen icon...
           </p>
         </div>
         <div class="sec todo">
@@ -82,30 +82,16 @@
             <span class="icon"><i class="fa-solid fa-plus"></i></span>
           </div>
           <ul>
-            <li>
-              <input type="checkbox" />
-              <span>Make Reviews</span>
-            </li>
-            <li>
-              <input type="checkbox" />
-              <span>Record Meet notes</span>
-            </li>
-            <li>
-              <input type="checkbox" />
-              <span>Shop for Event</span>
-            </li>
+            <span style="color: #999">to add todo, click on plus icon...</span>
           </ul>
           <span class="done">Completed</span>
-          <ul>
-            <li>
-              <input type="checkbox" checked />
-              <span>Meet Nikita</span>
-            </li>
-            <li>
-              <input type="checkbox" checked />
-              <span>Completed Backend</span>
-            </li>
-          </ul>
+          <ul><span style="color: #999;">no todos completed...</span></ul>
+        </div>
+        <div class="sec signout" onclick="window.location.assign(`/auth/sessionLogout`)">
+          <div class="title">
+            <i style="padding-right: .5rem;" class="fa-solid fa-arrow-right-from-bracket"></i>
+            Sign Out
+          </div>
         </div>
       </section>
       <section id="cal"></section>

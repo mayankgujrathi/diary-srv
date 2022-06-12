@@ -28,8 +28,89 @@ document.addEventListener("DOMContentLoaded", (_) => {
           }, 200)
         })
       })
+    setTimeout(() => {
+      const sdate =
+        document
+          .querySelector(".side-panel .date")
+          .innerHTML.replace(", ", "")
+          .trim() || new Date().toDateString()
+      console.log()
+      db.collection(`todo/${currUEmail}/${sdate}`)
+        .get()
+        .then((snap) => {
+          const todo = side_panel.querySelectorAll(".todo ul")
+          // todo[0].innerHTML =
+          todo[0].innerHTML = `<span style="color: #999">to add todo, click on plus icon...</span>`
+          todo[1].innerHTML = `<span style="color: #999;">no todos completed...</span>`
+          let todos = []
+          snap.forEach((doc) =>
+            todos.push({
+              id: doc.id,
+              data: doc.data(),
+            })
+          )
+          console.log(todos)
+          // todos = todos.filter((doc) => doc.id == s)
+          const template = (doc) => `
+            <li>
+              <input type="checkbox" ${
+                doc.data.completed ? "checked" : ""
+              } id="${doc.id + doc.data.body}" data="${doc.data.body}" />
+            <label for="${doc.id + doc.data.body}" data="${doc.data.body}">${
+            doc.data.body
+          }</label>
+            <div style="float: right;">
+              <i class="fa-solid fa-trash todo-delete-btn" data="${doc.id}"></i>
+            </div>
+            </li>
+            `
+          const undone = todos
+            .filter((doc) => doc.data.completed == false)
+            .map(template)
+          const done = todos
+            .filter((doc) => doc.data.completed == true)
+            .map(template)
+          if (undone.length > 0) todo[0].innerHTML = undone
+          if (done.length > 0) todo[1].innerHTML = done
+          document.querySelectorAll(".todo-delete-btn").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              if (!confirm("Do you want to delete?")) {
+                return
+              }
+              const id = e.target.getAttribute("data")
+              db.collection(`todo/${currUEmail}/${sdate}`)
+                .doc(id)
+                .delete()
+                .then(() => {
+                  window.location.reload()
+                })
+            })
+          })
+          todos.forEach((doc) => {
+            document
+              .getElementById(doc.id + doc.data.body)
+              .addEventListener("change", (e) => {
+                const state = e.target.checked
+                db.collection(`todo/${currUEmail}/${sdate}`)
+                  .doc(doc.id)
+                  .set({
+                    completed: state,
+                    last_modified_date: new Date(),
+                    body: document
+                      .getElementById(doc.id + doc.data.body)
+                      .getAttribute("data"),
+                  })
+                  .then(() => {
+                    window.location.reload()
+                  })
+              })
+          })
+        })
+    }, 300)
   }
-  updateSidePanel()
+  setTimeout(() => {
+    updateSidePanel()
+  }, 300)
   !(function (side_panel) {
     const events = []
     db.collection(`remainder/${currUEmail}/remainders`)
@@ -270,7 +351,10 @@ document.addEventListener("DOMContentLoaded", (_) => {
     side_panel.querySelector(".todo .icon").addEventListener("click", (_) => {
       modal.classList.toggle("show")
       if (!modal.classList.contains("as_todo")) {
-        const date = side_panel.querySelector(".date").innerHTML
+        const date = side_panel
+          .querySelector(".date")
+          .innerHTML.replace(", ", "")
+          .trim()
         modal.innerHTML += `
           <span class="close-modal" title="close">
             <i class="fa-solid fa-chevron-left"></i>
@@ -282,25 +366,26 @@ document.addEventListener("DOMContentLoaded", (_) => {
               <input type="text" id="add-todo" placeholder="add todo..." />
               <i class="fa-solid fa-square-plus add-todo-btn"></i>
             </div>
-            <ul>
-              <li>
-                <span>Make Reviews</span>
-                <span>
-                  <i class="fa-solid fa-trash"></i>
-                  <i class="fa-solid fa-square-pen"></i>
-                </span>
-              </li>
-              <li>
-                <span>record Meet Notes</span>
-                <span>
-                  <i class="fa-solid fa-trash"></i>
-                  <i class="fa-solid fa-square-pen"></i>
-                </span>
-              </li>
-            </ul>
           </div>
         `
         modal.classList.add("as_todo")
+        modal.querySelector(".add-todo-btn").addEventListener("click", (e) => {
+          const txt = document.getElementById("add-todo").value
+          if (txt == "") {
+            alert("Please fill details")
+            return
+          }
+          db.collection(`todo/${currUEmail}/${date}`)
+            .add({
+              body: txt,
+              completed: false,
+              last_modified_date: new Date(),
+            })
+            .then(() => {
+              modal.classList.remove("show")
+              window.location.reload()
+            })
+        })
         setTimeout(() => {
           modal.querySelector("#add-todo").focus()
         }, 300)

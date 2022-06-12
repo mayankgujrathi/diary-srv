@@ -94,6 +94,7 @@ main {
       p {
         margin-top: 1rem;
         color: #aaa;
+        overflow-x: hidden;
         &::before {
           content: "";
         }
@@ -110,8 +111,12 @@ main {
         list-style: none;
         li {
           margin-top: 0.5rem;
-          span {
+          label {
             color: #ccc;
+          }
+          i {
+            color: #ccc;
+            cursor: pointer;
           }
         }
       }
@@ -124,6 +129,12 @@ main {
       }
       .todo-done {
         color: #888;
+      }
+    }
+    .signout {
+      cursor: pointer;
+      .title {
+        border-top: 1px solid rgba($color: #ccc, $alpha: 0.2);
       }
     }
   }
@@ -177,6 +188,9 @@ main {
   &.as_journal {
     width: 80vw;
     background-color: #f6f6f6;
+    .CodeMirror-scroll {
+      height: 67vh;
+    }
     .journal_ed_wrap {
       padding: 1rem;
     }
