@@ -1,0 +1,46 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.selectable {
+  user-select: text;
+}
+
+@supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  main {
+    background-color: rgba($color: #222, $alpha: 0.3);
+  }
+}
+
+@mixin glass($color, $x, $y) {
+  background: linear-gradient(
+    to right bottom,
+    rgba($color: $color, $alpha: $x),
+    rgba($color: $color, $alpha: $y)
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 0 8px 8px rgba(0, 0, 0, 0.2);
+}
+
+@mixin glass-bright {
+  @include glass(255, 0.5, 0.3);
+}
+
+body {
+  width: 100vw;
+  height: 100%;
+  min-height: 100vh;
+  background-image: url(/assets/bg.webp);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.editor-toolbar {
+  background-color: #fff;
+}

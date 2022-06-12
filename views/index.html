@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <script src="/js/base.js"></script>
+    <link rel="stylesheet" href="/css/index.css" />
+    <title>Diary</title>
+  </head>
+  <body>
+    <main>
+      <section class="title">
+        <span class="heading"><%= user.email %>'s Diary</span>
+        <span class="sub">Capture your Days and plan Todos</span>
+      </section>
+      <section class="apps">
+        <div class="app" title="Manage Books">
+          <img src="/assets/icons/books.png" alt="Book" />
+          <!-- <p class="name">Books</p> -->
+        </div>
+        <div class="app" title="Manage Notes">
+          <img src="/assets/icons/notes.png" alt="Notes" />
+          <!-- <p class="name">Notes</p> -->
+        </div>
+        <div class="app" title="Manage Todos">
+          <img src="/assets/icons/todos.png" alt="Todos" />
+          <!-- <p class="name">Todos</p> -->
+        </div>
+        <div class="app" title="Manage Events" onclick="_util.mov('/cal')">
+          <img src="/assets/icons/calendar.png" alt="Calender" />
+          <!-- <p class="name">Calender</p> -->
+        </div>
+        <!-- <div class="app" title="New Quick Note">
+        <img src="./assets/icons/quick-notes.png" alt="Quick">
+        <p class="name">Quick Notes</p>
+      </div> -->
+      </section>
+      <section class="quick-apps">
+        <section class="quick-notes"></section>
+        <section class="quick-todos"></section>
+      </section>
+      <section class="recents">
+        <section class="recent remainder">
+          <p class="heading">Remainders</p>
+          <p class="none">no events</p>
+        </section>
+        <section class="recent books">
+          <p class="heading">Recent Books</p>
+          <p class="none">no recents</p>
+        </section>
+        <section class="recent notes">
+          <p class="heading">Recent Notes</p>
+          <p class="none">no recents</p>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
