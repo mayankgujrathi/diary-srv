@@ -6,11 +6,10 @@ document.addEventListener("DOMContentLoaded", (_) => {
   const currUEmail = document.querySelector("main").getAttribute("user-email")
   !(function (side_panel) {
     const events = []
-    db.collection("remainder")
+    db.collection(`remainder/${currUEmail}/remainders`)
       .get()
       .then((snap) => {
         snap.forEach((doc) => {
-          if (doc.id !== currUEmail) return
           const data = doc.data()
           const start = new Date(data.start.seconds * 1000)
           const end = new Date(data.end.seconds * 1000)
@@ -20,32 +19,34 @@ document.addEventListener("DOMContentLoaded", (_) => {
             start: start,
             end: end,
           })
-        })
-
-        const cal = new FullCalendar.Calendar(document.getElementById("cal"), {
-          initialView: "dayGridMonth",
-          headerToolbar: {
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay,list",
-          },
-          events: events,
-        })
-        cal.render()
-        console.log(events)
-        const now = new Date().toDateString()
-        side_panel.querySelector(".date").innerHTML =
-          now.substring(0, 3) + ", " + now.slice(3)
-        document
-          .querySelector("button[title='This month']")
-          .addEventListener("click", (_) => {
-            side_panel.querySelector(".date").innerHTML =
-              now.substring(0, 3) + ", " + now.slice(3)
-          })
-        cal.on("dateClick", (info) => {
-          const dateStr = info.date.toDateString()
+          const cal = new FullCalendar.Calendar(
+            document.getElementById("cal"),
+            {
+              initialView: "dayGridMonth",
+              headerToolbar: {
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay,list",
+              },
+              events: events,
+            }
+          )
+          cal.render()
+          console.log(events)
+          const now = new Date().toDateString()
           side_panel.querySelector(".date").innerHTML =
-            dateStr.substring(0, 3) + ", " + dateStr.slice(3)
+            now.substring(0, 3) + ", " + now.slice(3)
+          document
+            .querySelector("button[title='This month']")
+            .addEventListener("click", (_) => {
+              side_panel.querySelector(".date").innerHTML =
+                now.substring(0, 3) + ", " + now.slice(3)
+            })
+          cal.on("dateClick", (info) => {
+            const dateStr = info.date.toDateString()
+            side_panel.querySelector(".date").innerHTML =
+              dateStr.substring(0, 3) + ", " + dateStr.slice(3)
+          })
         })
       })
   })(side_panel)
