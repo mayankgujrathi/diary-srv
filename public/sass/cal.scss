@@ -180,6 +180,25 @@ main {
     .journal_ed_wrap {
       padding: 1rem;
     }
+    .save {
+      float: right;
+      border: none;
+      color: hsl(240, 100%, 53%);
+      font-size: large;
+      padding: 0.4rem;
+      margin-right: 2rem;
+      border-radius: 0.2rem;
+      cursor: pointer;
+      span {
+        color: hsl(240, 100%, 60%);
+        padding-left: 0.25rem;
+      }
+      &:hover,
+      &:active,
+      &:focus {
+        background-color: hsl(240, 100%, 90%);
+      }
+    }
     .heading {
       display: block;
       text-align: center;

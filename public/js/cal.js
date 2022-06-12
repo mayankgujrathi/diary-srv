@@ -4,6 +4,32 @@ document.addEventListener("DOMContentLoaded", (_) => {
   const side_panel = document.querySelector(".side-panel")
   const db = firebase.firestore()
   const currUEmail = document.querySelector("main").getAttribute("user-email")
+  const updateSidePanel = () => {
+    db.collection(`journal/${currUEmail}/journal`)
+      .get()
+      .then((snap) => {
+        const p = side_panel.querySelector(".journal p")
+        p.innerHTML = `<p id="no-journal">to add new journal, click on pen icon...</p>`
+        p.id = "no-journal"
+        snap.forEach((doc) => {
+          const data = doc.data()
+          const date = new Date(data.date.seconds * 1000)
+          setTimeout(() => {
+            if (
+              doc.id ==
+              document
+                .querySelector(".side-panel .date")
+                .innerHTML.replace(", ", "")
+                .trim()
+            ) {
+              p.innerHTML = data.body
+              p.id = ""
+            }
+          }, 200)
+        })
+      })
+  }
+  updateSidePanel()
   !(function (side_panel) {
     const events = []
     db.collection(`remainder/${currUEmail}/remainders`)
@@ -64,8 +90,6 @@ document.addEventListener("DOMContentLoaded", (_) => {
             })
             .slice(0, 4)
             .join("")
-
-          console.log(sorted_events.map((e) => e.data))
           const now = new Date().toDateString()
           side_panel.querySelector(".date").innerHTML =
             now.substring(0, 3) + ", " + now.slice(3)
@@ -79,6 +103,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
             const dateStr = info.date.toDateString()
             side_panel.querySelector(".date").innerHTML =
               dateStr.substring(0, 3) + ", " + dateStr.slice(3)
+            updateSidePanel()
           })
         })
       })
@@ -109,7 +134,8 @@ document.addEventListener("DOMContentLoaded", (_) => {
           }'s Journal</span>
           <div class="journal_ed_wrap">
             <textarea id="journal_ed"></textarea>
-          </div>`
+          </div>
+          <button class="save"><i class="fa-solid fa-floppy-disk"></i><span>Save</span></button>`
         modal.querySelector(".close-modal").addEventListener("click", (_) => {
           modal.classList.remove("show")
           setTimeout(() => {
@@ -117,6 +143,11 @@ document.addEventListener("DOMContentLoaded", (_) => {
             modal.innerHTML = ""
           }, 300)
         })
+        const p = side_panel.querySelector(".journal p")
+        let value = ""
+        if (p.getAttribute("id") !== "no-journal") {
+          value = p.innerHTML
+        }
         setTimeout(() => {
           const ed = new SimpleMDE({
             element: document.getElementById("journal_ed"),
@@ -132,6 +163,25 @@ document.addEventListener("DOMContentLoaded", (_) => {
             //     title: "Save",
             //   },
             // ],
+          })
+          ed.value(value)
+          modal.querySelector(".save").addEventListener("click", (e) => {
+            const body = ed.value().trim()
+            const last_mod_date = new Date()
+            const date = new Date(
+              document.querySelector(".side-panel .date").innerHTML
+            ).toDateString()
+            db.collection(`journal/${currUEmail}/journal`)
+              .doc(date)
+              .set({
+                body,
+                last_modified_date: last_mod_date,
+                date: date,
+              })
+              .then(() => {
+                modal.classList.remove("show")
+                window.location.reload()
+              })
           })
         }, 300)
       }
