@@ -12,13 +12,14 @@ document.addEventListener("DOMContentLoaded", (_) => {
         snap.forEach((doc) => {
           const data = doc.data()
           const start = new Date(data.start.seconds * 1000)
-          const end = new Date(data.end.seconds * 1000)
-          events.push({
-            id: `${start.getTime()}<${data.title}>`,
-            title: data.title,
-            start: start,
-            end: end,
-          })
+          let end = null
+          if (data.end) end = new Date(data.end.seconds * 1000)
+          const id = `${start.getTime()}<${data.title}>`
+          events.push(
+            end
+              ? { id, title: data.title, start, end }
+              : { id, title: data.title, start, end }
+          )
           const cal = new FullCalendar.Calendar(
             document.getElementById("cal"),
             {
@@ -32,7 +33,39 @@ document.addEventListener("DOMContentLoaded", (_) => {
             }
           )
           cal.render()
-          console.log(events)
+          const sorted_events = events
+            .map((e) => {
+              return { t: e.start.getTime(), data: e }
+            })
+            .filter((e) => e.t > Date.now())
+            .sort((a, b) => {
+              if (Date.now() > a.t && Date.now() > b.t) {
+                return a.t < b.t
+              }
+              return false
+            })
+          const rem = document.querySelector(".remainders table")
+          rem.innerHTML = ""
+          rem.innerHTML = sorted_events
+            .map((e) => {
+              return `
+                <tr>
+                  <td>
+                    ${e.data.start.toDateString().split(" ")[1]} <br />
+                    ${
+                      e.data.start.getDate() < 10
+                        ? "0" + e.data.start.getDate()
+                        : e.data.start.getDate()
+                    }
+                  </td>
+                  <td>${e.data.title}</td>
+                </tr>
+              `
+            })
+            .slice(0, 4)
+            .join("")
+
+          console.log(sorted_events.map((e) => e.data))
           const now = new Date().toDateString()
           side_panel.querySelector(".date").innerHTML =
             now.substring(0, 3) + ", " + now.slice(3)
@@ -49,6 +82,17 @@ document.addEventListener("DOMContentLoaded", (_) => {
           })
         })
       })
+    if (!document.getElementById("cal").innerHTML) {
+      const cal = new FullCalendar.Calendar(document.getElementById("cal"), {
+        initialView: "dayGridMonth",
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay,list",
+        },
+      })
+      cal.render()
+    }
   })(side_panel)
   !(function (modal, side_panel) {
     const journal_e = document.querySelector(".journal .icon")
@@ -107,29 +151,56 @@ document.addEventListener("DOMContentLoaded", (_) => {
           <p class="sub-heading">on ${date}</p>
           <div class="ins">
             <div class="ipt">
-              <input type="text" id="txt-remainder" placeholder="Remainder..." />
-              <i class="fa-solid fa-square-plus add-remainder-btn"></i>
+              <input type="text" id="txt-remainder" placeholder="Remainder..." required />
+              <i class="fa-solid fa-square-plus" id="add-remainder-btn"></i>
             </div>
             <!-- <input type="text" id="txt-remainder" placeholder="Remainder..." /> -->
             <div class="datetime-input">
               <span>Start Date</span>
-              <input type="date" id="start-date" />
-              <input type="time" id="start-time" />
+              <input type="date" id="start-date" required />
+              <input type="time" id="start-time" required />
             </div>
             <div class="datetime-input">
               <span>End Date</span>
-              <input type="date" id="end-date" />
-              <input type="time" id="end-time" />
+              <input type="date" id="end-date" required />
+              <input type="time" id="end-time" required />
             </div>
           </div>
         `
           modal.classList.add("as_add_remainder")
+          modal.classList.toggle("show")
           const txt = document.getElementById("txt-remainder")
           setTimeout(() => {
             txt.focus()
           }, 300)
+          document
+            .getElementById("add-remainder-btn")
+            .addEventListener("click", (e) => {
+              const title = document.getElementById("txt-remainder").value
+              const start_date = document.getElementById("start-date").value
+              const start_time = document.getElementById("start-time").value
+              const end_date = document.getElementById("end-date").value
+              const end_time = document.getElementById("end-time").value
+              if (title == "" || start_date == "" || start_time == "") {
+                alert("Please fill the details!")
+                return
+              }
+              const start = new Date(`${start_date}:${start_time}`)
+              let end = null
+              if (end_date != "" || end_time != "")
+                end = new Date(`${end_date} ${end_time}`)
+              db.collection(`remainder/${currUEmail}/remainders`)
+                .add(end ? { title, start, end } : { title, start })
+                .then(() => {
+                  modal.classList.remove("show")
+                  setTimeout(() => {
+                    modal.classList.remove("as_add_remainder")
+                    modal.innerHTML = ""
+                  }, 300)
+                  window.location.reload()
+                })
+            })
         }
-        modal.classList.toggle("show")
         if (!modal.classList.contains("show")) {
           setTimeout(() => {
             modal.classList.remove("as_add_remainder")
